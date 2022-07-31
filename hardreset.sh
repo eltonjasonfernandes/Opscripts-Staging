@@ -13,26 +13,28 @@ if [[ ! $REPLY =~ ^[Yy]$ ]]
 then
     exit 1
 fi
-
-    echo "Stopping All Opsview Services, Wait For 1.30 Minutes"
-    echo $(/opt/opsview/watchdog/bin/opsview-monit stop all && sleep 100s)
-
-if $(/opt/opsview/watchdog/bin/opsview-monit summary -B | awk '{print $2}' | head -n 3 | grep Not -q;)
+echo Stopping all opsview components...
+/opt/opsview/watchdog/bin/opsview-monit stop all
+while : ; do
+/opt/opsview/watchdog/bin/opsview-monit summary -B | egrep -q 'Running|Initializing' && sleep 10 || break
+done;
+echo Stopping opsview-agent and opsview-watchdog...
+systemctl stop opsview-agent opsview-watchdog
+echo Cleaning .pid and .lock files...
+find /opt/opsview \( -name *.pid -o -name *.lock \) -delete | sleep 2s
+echo Killing opsview user processes...
+pkill -u opsview | sleep 2s
+echo Checking if there are any remaining processes running under the opsview user
+ps -fu opsview | sleep 2s
+echo Starting opsview-agent and opsview-watchdog...
+systemctl start opsview-agent opsview-watchdog && systemctl status opsview-agent opsview-watchdog | grep -i active
+echo Starting opsview components...
+/opt/opsview/watchdog/bin/opsview-monit start all
+while : ; do
+/opt/opsview/watchdog/bin/opsview-monit summary -B | egrep -i 'Not Monitored|Initializing' && sleep 10 || break
+done;
+if /opt/opsview/watchdog/bin/opsview-monit summary -B | grep -i Running
 then
-    echo "All Services Are Now Stopped"
-else
-    echo "Error: Services Are Not Stopped"
-fi
-    echo "Stopping Opsview Agent & Watchdog"
-    echo $(systemctl stop opsview-agent opsview-watchdog && sleep 5s)
-    echo $(pkill -u opsview)
-    echo $(find /opt/opsview/* -name *.pid -delete && find /opt/opsview/* -name *.lock -delete) 
-    echo $(systemctl start opsview-agent opsview-watchdog)
-    echo "Starting All Opsview Services, Wait For 3 Minutes"
-if $(/opt/opsview/watchdog/bin/opsview-monit start all && sleep 3m && /opt/opsview/watchdog/bin/opsview-monit summary -B | grep OK -q;
-)
-then
-    echo "OK"
-else
-    echo "Error: Not OK"
+echo All Components Running!
+exit 0
 fi
