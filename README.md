@@ -1,2 +1,2 @@
-# opscripts-staging
+# scripts
 "{Inventions}"
