@@ -5,17 +5,17 @@
 MODULE=xt_RTPENGINE
 NOVALUE=null
 if
-lsmod | grep -w "$MODULE" > /dev/null || ssh 192.168.1.81 lsmod | grep -w "$MODULE" > /dev/null ;
+lsmod | grep -w "$MODULE" > /dev/null || ssh -q x.x.x.2 lsmod | grep -w "$MODULE" > /dev/null ;
 then
 echo "OK - SMP Kernel is loaded!"
 exit 0
 elif
-lsmod | grep -q "$MODULE" && ssh 192.168.1.81 lsmod | grep -q "$MODULE" ;
+lsmod | grep -q "$MODULE" && ssh -q x.x.x.2 lsmod | grep -q "$MODULE" ;
 then
 echo "WARNING - SMP Kernel Unloaded on Both SIGs!"
 exit 1
 elif
-lsmod | grep -w "$MODULE" > /dev/null && ssh 192.168.1.81 lsmod | grep -w "$MODULE" > /dev/null ;
+lsmod | grep -w "$MODULE" > /dev/null && ssh -q x.x.x.2 lsmod | grep -w "$MODULE" > /dev/null ;
 then
 echo "CRITICAL - SMP Kernel Loaded On Both SIGs!"
 exit 2
