@@ -2,7 +2,7 @@
 ######################
 ## CHECK SMP KERNEL ##
 ######################
-MODULE=ip_tables
+MODULE=xt_RTPENGINE
 SIG_A= 127.0.0.1
 SIG_B= 10.140.3.136
 NULL= ''
