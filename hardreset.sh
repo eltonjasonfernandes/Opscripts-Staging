@@ -2,9 +2,7 @@
 
 : '
 ###################################################################################################################################################
-#                                       Script To Hard Restart All Opsview Components On An Opsview Host                                          #
-#  If an Opsview host shuts down before all its Opsview components stop, old .pid and .lock files might prevent the components starting properly. #
-#  Follow these steps to cleanly restart all Opsview components on an Opsview host, including tidying up left-over .pid and .lock files.          #
+#                                       Script To Hard Restart All Opsview Components On An Opsview Host                                          # 
 ###################################################################################################################################################'
 
 read -p "Are you sure? " -n 1 -r
