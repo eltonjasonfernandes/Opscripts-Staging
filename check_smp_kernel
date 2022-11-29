@@ -1,23 +1,32 @@
-#!/bin/sh
+#!/bin/sh 
 ######################
 ## CHECK SMP KERNEL ##
 ######################
+
 MODULE=xt_RTPENGINE
-NOVALUE=null
-if
-lsmod | grep -w "$MODULE" > /dev/null || ssh -q x.x.x.2 lsmod | grep -w "$MODULE" > /dev/null ;
-then
-echo "OK - SMP Kernel is loaded!"
-exit 0
-elif
-lsmod | grep -q "$MODULE" && ssh -q x.x.x.2 lsmod | grep -q "$MODULE" ;
-then
-echo "WARNING - SMP Kernel Unloaded on Both SIGs!"
-exit 1
-elif
-lsmod | grep -w "$MODULE" > /dev/null && ssh -q x.x.x.2 lsmod | grep -w "$MODULE" > /dev/null ;
+null=''
+######################
+if 
+lsmod | grep -qwi "$MODULE" && ssh -q 10.140.3.136 << EOF 
+lsmod | grep -qwi "$MODULE"
+EOF
 then
 echo "CRITICAL - SMP Kernel Loaded On Both SIGs!"
 exit 2
-fi
 
+elif
+lsmod | grep -qwi "$MODULE" || ssh -q 10.140.3.136 << EOF 
+lsmod | grep -qwi "$MODULE" 
+EOF
+then
+echo "OK - SMP Kernel is loaded!"
+exit 0
+
+elif
+lsmod | grep -qwi "$MODULE" ; echo $? -eq 1 > /dev/null & ssh -q 10.140.3.136 << EOF 
+lsmod | grep -qwi "$MODULE" ; echo $? -eq 1 > /dev/null 
+EOF
+then
+echo "WARNING - SMP Kernel Unloaded on Both SIGs!"
+exit 1
+fi
