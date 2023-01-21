@@ -1,0 +1,38 @@
+#!/bin/bash
+
+# DB file
+database_file="/opt/opsview/timeseriesrrd/var/data/+metadata.db"
+
+# Temp file
+temp_file="/tmp/temp.db"
+
+# Corruption check
+echo "PRAGMA integrity_check;" | sqlite3 $database_file > /dev/null 2>&1
+
+if [ $? -ne 0 ]; then
+    # Create a backup of the original database
+    cp $database_file $temp_file
+
+    # Attempt to repair db
+    echo "PRAGMA auto_vacuum = 1;" | sqlite3 $database_file > /dev/null 2>&1
+
+    echo "PRAGMA integrity_check;" | sqlite3 $database_file > /dev/null 2>&1
+    if [ $? -ne 0 ]; then
+        # Repair failed, restore from backup
+        mv $temp_file $database_file
+        echo "CRITICAL - DB repair failed. Restored from backup."
+        # Exit code 2 for critical
+        exit 2
+    else
+        # Repair succeeded
+        rm $temp_file
+        echo "WARNING - DB repair succeeded but it's recommended to review the data"
+        # Exit code 1 for warning
+        exit 1
+    fi
+else
+    # No corruption found
+    echo "OK - No corruption found in DB."
+    # Exit code 0 for OK
+    exit 0
+fi
