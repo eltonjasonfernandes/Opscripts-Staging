@@ -47,12 +47,12 @@ threshold=$(echo "$HOSTS_LIMIT * 0.7" | bc)
 
 # Convert $CURRENT_HOSTS to a float before comparison
 if (( $(echo "$CURRENT_HOSTS >= $threshold" | bc -l) )); then
-    echo "WARNING - $CURRENT_HOSTS/$HOSTS_LIMIT - More than 70% of the Hosts Limit Reached"
+    echo "WARNING - $CURRENT_HOSTS/$HOSTS_LIMIT - More than 70% of the Hosts Limit Reached | hosts=$CURRENT_HOSTS;;;"
     exit 1
 elif [[ "$CURRENT_HOSTS" -ge "$HOSTS_LIMIT" ]]; then
-    echo "CRITICAL - $CURRENT_HOSTS/$HOSTS_LIMIT - Number of hosts is greater than hosts limit"
+    echo "CRITICAL - $CURRENT_HOSTS/$HOSTS_LIMIT - Number of hosts is greater than hosts limit | hosts=$CURRENT_HOSTS;;;"
     exit 2
 else
-    echo "OK - $CURRENT_HOSTS/$HOSTS_LIMIT - Less than 70% of Current Host Limit"
+    echo "OK - $CURRENT_HOSTS/$HOSTS_LIMIT - Less than 70% of Current Host Limit | hosts=$CURRENT_HOSTS;;"
     exit 0
 fi
