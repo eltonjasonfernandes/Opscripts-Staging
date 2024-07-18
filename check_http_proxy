@@ -1,0 +1,25 @@
+#!/bin/bash
+
+# endpoint
+endpoint="http://www.example.com"
+
+# proxy server to use
+proxy="http://proxy.example.com:8080"
+
+# timeout for HTTP request in secs
+timeout=5
+
+# Check HTTP endpoint through the proxy
+result=$(curl --proxy "$proxy" --silent --max-time "$timeout" --write-out "%{http_code}" "$endpoint")
+
+# Check the HTTP status code
+if [ "$result" -eq 200 ]; then
+  echo "OK - HTTP status code is 200."
+  exit 0
+elif [ "$result" -ge 400 ] && [ "$result" -lt 500 ]; then
+  echo "WARNING - HTTP status code is $result."
+  exit 1
+else
+  echo "CRITICAL - HTTP status code is $result."
+  exit 2
+fi
